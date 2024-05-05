@@ -3,7 +3,7 @@ from dotenv import dotenv_values
 from pymongo import MongoClient
 from rich.console import Console
 
-from app.repository import CatsRepository
+from app.repositories import CatsRepository
 from app.services import new_record, read_all
 
 console = Console()

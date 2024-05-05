@@ -1,7 +1,7 @@
 from beaupy import prompt, select
 
 from app.models import CatModel
-from app.repository import CatsRepository
+from app.repositories import CatsRepository
 
 
 def update_record(repo: CatsRepository, cat: dict):
