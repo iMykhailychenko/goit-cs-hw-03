@@ -29,3 +29,18 @@ python seed.py
 > Tasks data  
 
 ![Result](docs/tasks.png)
+
+
+### Task 2
+
+1. Start container with mongo
+   
+```bash
+make up
+```
+
+2. Run python script
+
+```bash
+python main.py
+```
