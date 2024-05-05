@@ -5,6 +5,7 @@ from rich.console import Console
 
 from app.repositories import CatsRepository
 from app.services import new_record, read_all
+from app.models import DBError
 
 console = Console()
 config = dotenv_values(".env")
@@ -34,10 +35,13 @@ def main():
     repo = CatsRepository(db)
 
     while True:
-        action = select(actions, cursor="🢧", cursor_style="cyan")
-        if handlers_map[action](repo) == EXIT_CODE:
-            print("Bye!")
-            break
+        try:
+            action = select(actions, cursor="🢧", cursor_style="cyan")
+            if handlers_map[action](repo) == EXIT_CODE:
+                print("Bye!")
+                break
+        except DBError as e:
+            console.print(f"[red]DB Error: {e}[/red]")
 
 
 if __name__ == "__main__":

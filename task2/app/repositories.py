@@ -1,4 +1,5 @@
 from bson import ObjectId
+from app.models import DBError
 
 
 class CatsRepository:
@@ -6,13 +7,25 @@ class CatsRepository:
         self.__collection = db["cats"]
 
     def create(self, values: dict):
-        return self.__collection.insert_one(values)
+        try:
+            return self.__collection.insert_one(values)
+        except Exception as e:
+            raise DBError(e)
 
     def read(self):
-        return list(self.__collection.find())
+        try:
+            return list(self.__collection.find())
+        except Exception as e:
+            raise DBError(e)
 
     def update(self, id: str, values: dict):
-        self.__collection.update_one({"_id": ObjectId(id)}, {"$set": values})
+        try:
+            self.__collection.update_one({"_id": ObjectId(id)}, {"$set": values})
+        except Exception as e:
+            raise DBError(e)
 
     def delete(self, id: str):
-        return self.__collection.delete_one({"_id": ObjectId(id)})
+        try:
+            return self.__collection.delete_one({"_id": ObjectId(id)})
+        except Exception as e:
+                raise DBError(e)
