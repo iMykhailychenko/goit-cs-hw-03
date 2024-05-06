@@ -4,20 +4,45 @@ from app.models import CatModel
 from app.repositories import CatsRepository
 
 
+def retry(name: str, fn):
+    print(f"No cat found with name {name} (Enter to go back)")
+
+    options = ["Back", "Search more"]
+    action = select(options, cursor="🢧", cursor_style="cyan")
+    if action == "Search more":
+        fn()
+    return
+
+
 def update_age(repo: CatsRepository):
     name = prompt("Name:", target_type=str)
-    age = prompt(f"Name: {name}\nAge:", target_type=int)
+    cat = repo.find_by_name(name)
+
+    if not cat:
+        return retry(name, lambda: delete_by_name(repo))
+
+    age = prompt(f"Name: {name}\nAge:", target_type=int, initial_value=str(cat["age"]))
     repo.update_by_name(name, {"age": age})
+    print(f"Age updated\n\n")
 
 
 def delete_by_name(repo: CatsRepository):
     name = prompt("Name:", target_type=str)
+    cat = repo.find_by_name(name)
+
+    if not cat:
+        return retry(name, lambda: delete_by_name(repo))
+
     repo.delete_by_name(name)
+    print(f"Cat {name} removed\n\n")
 
 
-def update_features(repo: CatsRepository):
+def add_features(repo: CatsRepository):
     name = prompt("Name:", target_type=str)
-    features = []
+    cat = repo.find_by_name(name)
+    if not cat:
+        return retry(name, lambda: add_features(repo))
+    features = cat["features"]
 
     while True:
         feature = prompt(
@@ -27,7 +52,9 @@ def update_features(repo: CatsRepository):
         if not feature:
             break
         features.append(feature)
+
     repo.update_by_name(name, {"features": features})
+    print(f"Features updated\n\n")
 
 
 def view_record(repo: CatsRepository, item: dict):
@@ -44,13 +71,7 @@ def find_by_name(repo: CatsRepository):
     cat = repo.find_by_name(name)
 
     if not cat:
-        print(f"No cat found with name {name} (Enter to go back)")
-
-        options = ["Back", "Search more"]
-        action = select(options, cursor="🢧", cursor_style="cyan")
-        if action == "Search more":
-            find_by_name(repo)
-        return
+        return retry(name, lambda: find_by_name(repo))
 
     print(f"Cat info:\n{cat['name']} - {cat['age']} - {cat['features']}\n\n")
     view_record(repo, cat)
@@ -72,6 +93,7 @@ def update_all(repo: CatsRepository, cat: dict):
 
     record = CatModel(name=name, age=age, features=features)
     repo.update(cat["_id"], record.model_dump())
+    print(f"Cat {name} updated\n\n")
 
 
 def read_all(repo: CatsRepository):
@@ -79,8 +101,8 @@ def read_all(repo: CatsRepository):
     options = ["Back"] + [
         f"{cat['name']} - {cat['age']} - {cat['features']}" for cat in cats
     ]
-
     index = select(options, cursor="🢧", cursor_style="cyan", return_index=True)
+
     if not index:
         return
 
@@ -103,3 +125,9 @@ def new_record(repo: CatsRepository):
 
     record = CatModel(name=name, age=age, features=features)
     repo.create(record.model_dump())
+    print(f"Cat {name} created\n\n")
+
+
+def delete_all(repo: CatsRepository):
+    repo.delete_all()
+    print("All cats removed\n\n")

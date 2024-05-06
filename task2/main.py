@@ -5,7 +5,15 @@ from rich.console import Console
 
 from app.models import DBError
 from app.repositories import CatsRepository
-from app.services import find_by_name, new_record, read_all, update_age, update_features, delete_by_name
+from app.services import (
+    add_features,
+    delete_all,
+    delete_by_name,
+    find_by_name,
+    new_record,
+    read_all,
+    update_age,
+)
 
 console = Console()
 config = dotenv_values(".env")
@@ -20,7 +28,7 @@ actions = [
     "Add new record",
     "Find by name",
     "Update age",
-    "Update features",
+    "Add more features",
     "Remove by name",
     "Remove all",
     "Exit",
@@ -33,9 +41,9 @@ handlers_map = {
     actions[1]: new_record,
     actions[2]: find_by_name,
     actions[3]: update_age,
-    actions[4]: update_features,
+    actions[4]: add_features,
     actions[5]: delete_by_name,
-    actions[6]: lambda repo: repo.delete_all(),
+    actions[6]: delete_all,
     actions[7]: lambda _: EXIT_CODE,
 }
 
